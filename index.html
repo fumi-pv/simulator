@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ffffff">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>戦闘力シミュレーター 完全安定版</title>
+
+<style>
+body { font-family:sans-serif; padding:16px; background:#f5f5f5; }
+.card { background:#fff; padding:16px; margin-bottom:16px; border-radius:12px; }
+input, select { width:100%; padding:8px; margin:6px 0; font-size:16px; }
+.row { display:flex; justify-content:space-between; font-weight:bold; margin:6px 0; }
+.card h2 {
+  text-align: left;
+}
+
+.card input,
+.card select {
+  text-align: right;
+}
+
+#quickPanel{
+position:fixed;
+display:none;
+background:#fff;
+border:1px solid #ccc;
+border-radius:8px;
+padding:6px;
+z-index:9999;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+<h2>キャラ</h2>
+<select id="character"></select>
+<button id="addChar">＋追加</button>
+</div>
+
+<div class="card">
+<h2>基本</h2>
+資質<input id="base">
+レベル<input id="level" type="number">
+係数<input id="coef" readonly>
+最終%<input id="final" type="number">
+</div>
+
+<div class="card">
+<h2>バフ</h2>
+<div id="buffArea"></div>
+</div>
+
+<div class="card">
+<h2>固定</h2>
+<div id="flatArea"></div>
+</div>
+
+<div class="card">
+<h2>結果</h2>
+<div class="row"><span>現在</span><span id="current">0</span></div>
+<div class="row"><span>変化後</span><span id="after">0</span></div>
+<div class="row"><span>差分</span><span id="diff">0</span></div>
+</div>
+
+<div class="card">
+<h2>合計</h2>
+<div class="row"><span>総戦闘力</span><span id="totalPower">0</span></div>
+</div>
+
+<div id="quickPanel">
+<button onclick="addQuick(3)">×1000</button>
+<button onclick="addQuick(4)">×10000</button>
+</div>
+
+<script>
+/* =====================
+STATE
+===================== */
+const state = {
+  character:"default",
+  base:0,
+  level:0,
+  final:0,
+  buffs:{},
+  flats:{},
+  dBase:0,
+  dBuff:0,
+  dFlat:0
+};
+
+let activeInput=null;
+
+/* =====================
+DOM
+===================== */
+const el={
+character:document.getElementById("character"),
+base:document.getElementById("base"),
+level:document.getElementById("level"),
+final:document.getElementById("final"),
+coef:document.getElementById("coef"),
+current:document.getElementById("current"),
+after:document.getElementById("after"),
+diff:document.getElementById("diff"),
+buffArea:document.getElementById("buffArea"),
+flatArea:document.getElementById("flatArea"),
+total:document.getElementById("totalPower"),
+quick:document.getElementById("quickPanel")
+};
+
+/* =====================
+係数
+===================== */
+const coefTable={
+50:575,100:925,150:1374,200:1931,250:2600,
+300:3384,350:4287,400:5305,450:6361,500:7586,
+550:8934,600:10400,650:11980,700:13678
+};
+
+function getCoef(l){
+l=+l||0;
+const k=Object.keys(coefTable).map(Number);
+
+if(l<=k[0])return coefTable[k[0]];
+if(l>=k.at(-1))return coefTable[k.at(-1)];
+
+for(let i=0;i<k.length-1;i++){
+if(l>=k[i]&&l<=k[i+1]){
+return coefTable[k[i]]+
+(coefTable[k[i+1]]-coefTable[k[i]])*(l-k[i])/(k[i+1]-k[i]);
+}
+}
+return coefTable[k[0]];
+}
+
+/* =====================
+計算
+===================== */
+function calc(s){
+const coef=getCoef(s.level);
+const buff=Object.values(s.buffs).reduce((a,b)=>a+(+b||0),0);
+const flat=Object.values(s.flats).reduce((a,b)=>a+(+b||0),0);
+const final=(+s.final||0)/100;
+
+const base=+s.base||0;
+
+const cur=Math.floor(base*coef*(1+buff/100)*(1+final)+flat);
+const aft=Math.floor((base+s.dBase)*coef*(1+(buff+s.dBuff)/100)*(1+final)+(flat+s.dFlat));
+
+return {current:cur,after:aft,diff:aft-cur,coef};
+}
+
+/* =====================
+UI生成
+===================== */
+function build(){
+const buffs={
+星ランク:"star",コレクション:"collection",釣り:"fishing",博物館:"museum",
+スキル:"skill",家族:"family",イベント:"event"
+};
+
+const flats={
+星ランク:"star",アイテム:"item",交渉:"trade",イベント:"event"
+};
+
+el.buffArea.innerHTML=Object.entries(buffs)
+.map(([k,v])=>`<div>${k}<input data-k="${v}"></div>`).join("");
+
+el.flatArea.innerHTML=Object.entries(flats)
+.map(([k,v])=>`<div>${k}<input class="quick-target" data-k="${v}"></div>`).join("");
+}
+
+/* =====================
+sync
+===================== */
+function sync(){
+state.base=+el.base.value||0;
+state.level=+el.level.value||0;
+state.final=+el.final.value||0;
+
+document.querySelectorAll("#buffArea input").forEach(i=>{
+state.buffs[i.dataset.k]=+i.value||0;
+});
+
+document.querySelectorAll("#flatArea input").forEach(i=>{
+state.flats[i.dataset.k]=+i.value||0;
+});
+}
+
+/* =====================
+render
+===================== */
+function render(){
+sync();
+
+const r=calc(state);
+
+el.coef.value=r.coef;
+el.current.textContent=r.current.toLocaleString();
+el.after.textContent=r.after.toLocaleString();
+el.diff.textContent=r.diff.toLocaleString();
+
+save();
+calcTotal();
+}
+
+/* =====================
+追従（桁上げ）
+===================== */
+function addQuick(mult){
+  if(!activeInput) return;
+
+  const raw = (activeInput.value || "0").replace(/,/g,"");
+
+  // 300 → "300" + "000" → "300000"
+  const newVal = raw + "0".repeat(mult);
+
+  activeInput.value = Number(newVal).toLocaleString();
+  activeInput.dispatchEvent(new Event("input"));
+}
+
+/* =====================
+合計
+===================== */
+function calcTotal(){
+let total=0;
+
+const list=JSON.parse(localStorage.getItem("char_list")||"[]");
+
+for(const name of list){
+const raw=localStorage.getItem("char_"+name);
+if(!raw) continue;
+
+const d=JSON.parse(raw);
+
+const safe={
+base:Number(d.base)||0,
+level:Number(d.level)||0,
+final:Number(d.final)||0,
+buffs:d.buffs||{},
+flats:d.flats||{},
+dBase:0,dBuff:0,dFlat:0
+};
+
+total+=calc(safe).current;
+}
+
+el.total.textContent=total.toLocaleString();
+}
+
+/* =====================
+キャラ管理
+===================== */
+el.character.onchange=()=>{
+state.character=el.character.value;
+load();
+};
+
+document.getElementById("addChar").onclick=()=>{
+const name=prompt("キャラ名");
+if(!name) return;
+
+const list=JSON.parse(localStorage.getItem("char_list")||"[]");
+if(!list.includes(name)) list.push(name);
+localStorage.setItem("char_list",JSON.stringify(list));
+
+const opt=document.createElement("option");
+opt.value=name;
+opt.textContent=name;
+el.character.appendChild(opt);
+
+el.character.value=name;
+
+state.character=name;
+state.base=0;
+state.level=0;
+state.final=0;
+state.buffs={};
+state.flats={};
+
+el.base.value="";
+el.level.value="";
+el.final.value="";
+
+build();
+save();
+render();
+};
+
+/* =====================
+save/load
+===================== */
+function save(){
+localStorage.setItem("char_"+state.character,JSON.stringify(state));
+}
+
+function load(){
+const d=JSON.parse(localStorage.getItem("char_"+state.character)||"{}");
+Object.assign(state,d);
+renderUI();
+render();
+}
+
+function renderUI(){
+el.base.value=state.base||"";
+el.level.value=state.level||"";
+el.final.value=state.final||"";
+
+document.querySelectorAll("#buffArea input").forEach(i=>{
+i.value=state.buffs[i.dataset.k]||"";
+});
+
+document.querySelectorAll("#flatArea input").forEach(i=>{
+i.value=state.flats[i.dataset.k]||"";
+});
+}
+
+/* =====================
+focus
+===================== */
+document.addEventListener("focusin",e=>{
+if(!e.target.classList.contains("quick-target")) return;
+activeInput=e.target;
+
+const r=e.target.getBoundingClientRect();
+
+el.quick.style.display="block";
+el.quick.style.left=r.left+"px";
+el.quick.style.top=r.bottom+"px";
+});
+
+document.addEventListener("click",e=>{
+if(!el.quick.contains(e.target)){
+el.quick.style.display="none";
+}
+});
+
+document.addEventListener("input",render);
+
+/* =====================
+init
+===================== */
+(function init(){
+
+if(!localStorage.getItem("char_list")){
+  localStorage.setItem("char_list", JSON.stringify(["default"]));
+}
+
+const list = JSON.parse(localStorage.getItem("char_list") || "[]");
+if(list.length===0)list.push("default");
+
+list.forEach(n=>{
+const o=document.createElement("option");
+o.value=n;
+o.textContent=n;
+el.character.appendChild(o);
+});
+
+el.character.value=list[0];
+
+state.character=list[0];
+
+build();
+load();
+})();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
+</script>
+</body>
+</html>
