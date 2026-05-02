@@ -4,7 +4,7 @@
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="app.js?v=20260502"></script>
-<link rel="stylesheet" href="style.css?v=260502.1">
+<link rel="stylesheet" href="style.css?v=260502.2">
 <meta name="theme-color" content="#ffffff">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -158,6 +158,17 @@ input:focus, select:focus {
   display:grid;
   grid-template-columns: 1fr 1fr;
   gap:6px;
+}
+
+/* 👇ここ追加（スマホ対応） */
+@media (max-width: 600px) {
+  .bonus-row {
+    grid-template-columns: 1fr 80px; /* 右側を細くする */
+  }
+
+  .bonus-row input {
+    font-size: 14px; /* 入力欄も少しコンパクトに */
+  }
 }
 
 /* =====================
