@@ -4,7 +4,7 @@
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="app.js?v=20260502"></script>
-<link rel="stylesheet" href="style.css?v=260502.6">
+<link rel="stylesheet" href="style.css?v=260502.7">
 <meta name="theme-color" content="#ffffff">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -260,6 +260,13 @@ input:focus, select:focus {
 <h2>キャラ</h2>
 <select id="character"></select>
 <button id="addChar">＋追加</button>
+</div>
+
+<div style="margin-top:10px; display:flex; gap:8px;">
+  <button id="exportBtn">Export</button>
+  <button id="importBtn">Import</button>
+
+  <input type="file" id="importFile" accept="application/json" style="display:none;">
 </div>
 
 <div class="card">
@@ -838,6 +845,86 @@ document.addEventListener("blur", (e)=>{
     formatNumberInput(e.target);
   }
 }, true);
+
+document.getElementById("exportBtn").addEventListener("click", () => {
+
+  const data = {
+    characters: JSON.parse(localStorage.getItem("char_list") || "[]"),
+    global: JSON.parse(localStorage.getItem("global_setting") || "{}")
+  };
+
+  // キャラ個別データも全部まとめる
+  const charList = data.characters;
+  const chars = {};
+
+  for (const name of charList) {
+    const raw = localStorage.getItem("char_" + name);
+    if (raw) chars[name] = JSON.parse(raw);
+  }
+
+  const exportData = {
+    characters: charList,
+    charData: chars,
+    global: data.global
+  };
+
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+    type: "application/json"
+  });
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "battle-data.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+});
+
+
+document.getElementById("importBtn").addEventListener("click", () => {
+  document.getElementById("importFile").click();
+});
+
+
+document.getElementById("importFile").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+
+      // キャラ一覧
+      if (data.characters) {
+        localStorage.setItem("char_list", JSON.stringify(data.characters));
+      }
+
+      // グローバル
+      if (data.global) {
+        localStorage.setItem("global_setting", JSON.stringify(data.global));
+      }
+
+      // キャラデータ
+      if (data.charData) {
+        for (const name in data.charData) {
+          localStorage.setItem("char_" + name, JSON.stringify(data.charData[name]));
+        }
+      }
+
+      alert("Import完了！");
+      location.reload();
+
+    } catch (err) {
+      alert("読み込み失敗");
+    }
+  };
+
+  reader.readAsText(file);
+});
 
 /* =====================
 init
