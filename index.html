@@ -4,7 +4,7 @@
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="app.js?v=20260502"></script>
-<link rel="stylesheet" href="style.css?v=260502.3">
+<link rel="stylesheet" href="style.css?v=260502.4">
 <meta name="theme-color" content="#ffffff">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,6 +61,16 @@ input, select {
 
   border:1px solid #ddd;
   border-radius:8px;
+}
+#basicGrid input {
+  width: 80%;
+  max-width: 90px;
+}
+@media (max-width: 600px) {
+  #basicGrid input {
+    width: 70%;
+    max-width: 80px;
+  }
 }
 
 button {
