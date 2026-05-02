@@ -4,7 +4,7 @@
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="app.js?v=20260502"></script>
-<link rel="stylesheet" href="style.css?v=260502.4">
+<link rel="stylesheet" href="style.css?v=260502.5">
 <meta name="theme-color" content="#ffffff">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -202,11 +202,22 @@ input:focus, select:focus {
     margin:4px 0;
   }
 
-  #basicGrid {
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap:6px;
-  }
+#basicGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+#basicGrid div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#basicGrid input {
+  width: 80px;
+  flex-shrink: 0;
+}
 
   #buffArea,
   #flatArea {
