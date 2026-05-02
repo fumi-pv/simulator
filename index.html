@@ -2,33 +2,217 @@
 <html lang="ja">
 <head>
 <link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
 <meta name="theme-color" content="#ffffff">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>戦闘力シミュレーター 完全安定版</title>
 
 <style>
-body { font-family:sans-serif; padding:16px; background:#f5f5f5; }
-.card { background:#fff; padding:16px; margin-bottom:16px; border-radius:12px; }
-input, select { width:100%; padding:8px; margin:6px 0; font-size:16px; }
-.row { display:flex; justify-content:space-between; font-weight:bold; margin:6px 0; }
+:root {
+  --bg: #f5f5f5;
+  --card: #ffffff;
+  --main: #4f46e5;      /* メインカラー */
+  --accent: #22c55e;    /* 強調 */
+  --text: #111827;
+  --subtext: #6b7280;
+
+  --font: "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif;
+}
+
+/* =====================
+数字フォント（ゲームUI用・改善版）
+===================== */
+#current, #after, #diff {
+  font-weight: 600;
+}
+input {
+  font-variant-numeric: tabular-nums;
+}
+
+body {
+  font-family:var(--font);
+  padding:16px;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.card {
+  background:var(--card);
+  padding:16px;
+  margin-bottom:16px;
+  border-radius:12px;
+
+  /* ★幅バグ対策（重要） */
+  width:100%;
+  max-width:100%;
+  display:block;
+
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+
+input, select {
+  width:100%;
+  padding:8px;
+  margin:6px 0;
+  font-size:16px;
+
+  border:1px solid #ddd;
+  border-radius:8px;
+}
+
+button {
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  background: #6366f1;
+  color: white;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0px);
+  opacity: 0.9;
+}
+
+#addChar {
+  background: #22c55e;
+}
+
+#addChar:hover {
+  background: #16a34a;
+}
+
+#quickPanel button {
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+  background: #111827;
+  color: white;
+}
+
+input:focus, select:focus {
+  outline:none;
+  border-color: var(--main);
+}
+
+.row {
+  display:flex;
+  justify-content:space-between;
+  font-weight:bold;
+  margin:6px 0;
+}
+
 .card h2 {
-  text-align: left;
+  text-align:left;
+  color:var(--main);
 }
 
 .card input,
 .card select {
-  text-align: right;
+  text-align:right;
 }
 
 #quickPanel{
-position:fixed;
-display:none;
-background:#fff;
-border:1px solid #ccc;
-border-radius:8px;
-padding:6px;
-z-index:9999;
+  position:fixed;
+  display:none;
+  background:#fff;
+  border:1px solid #ccc;
+  border-radius:8px;
+  padding:6px;
+  z-index:9999;
+}
+
+/* =====================
+ボーナス（★ここが本命）
+===================== */
+.bonus-row {
+  display:grid;
+  grid-template-columns: 1fr 120px; /* ←固定 */
+  align-items:center;
+  gap:8px;
+  width:100%;
+}
+
+.bonus-row span {
+  white-space:nowrap;
+}
+
+.bonus-row input {
+  width:auto;
+}
+
+.bonusArea {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:6px;
+}
+
+/* =====================
+スマホUI最適化
+===================== */
+@media (max-width: 600px) {
+
+  body {
+    padding:10px;
+  }
+
+  .card {
+    padding:10px;
+    margin-bottom:10px;
+  }
+
+  input, select {
+    font-size:14px;
+    padding:6px;
+    margin:4px 0;
+  }
+
+  #basicGrid {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:6px;
+  }
+
+  #buffArea,
+  #flatArea {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:6px;
+  }
+
+  #buffArea div,
+  #flatArea div {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+
+  #buffArea input,
+  #flatArea input {
+    width:60px;
+  }
+}
+
+/* =====================
+結果固定バー
+===================== */
+#resultBar {
+  position:sticky;
+  bottom:0;
+  background:var(--card);
+  padding:10px;
+  border-top:2px solid var(--main);
+  font-weight:bold;
+  color:var(--main);
 }
 </style>
 </head>
@@ -43,10 +227,35 @@ z-index:9999;
 
 <div class="card">
 <h2>基本</h2>
-資質<input id="base">
-レベル<input id="level" type="number">
-係数<input id="coef" readonly>
-最終%<input id="final" type="number">
+
+<div id="basicGrid">
+
+<div>資質 <input id="base"></div>
+<div>レベル <input id="level" type="number"></div>
+<div>係数 <input id="coef" readonly></div>
+<div>最終% <input id="final" type="number"></div>
+
+<div>属性
+<select id="type">
+  <option value="歓楽">歓楽</option>
+  <option value="勤勉">勤勉</option>
+  <option value="挑戦">挑戦</option>
+  <option value="博識">博識</option>
+  <option value="自由">自由</option>
+</select>
+</div>
+
+<div>レアリティ
+<select id="rarity">
+  <option value="UR">UR</option>
+  <option value="SSR">SSR</option>
+  <option value="SR">SR</option>
+  <option value="R">R</option>
+  <option value="N">N</option>
+</select>
+</div>
+
+</div>
 </div>
 
 <div class="card">
@@ -61,14 +270,112 @@ z-index:9999;
 
 <div class="card">
 <h2>結果</h2>
-<div class="row"><span>現在</span><span id="current">0</span></div>
-<div class="row"><span>変化後</span><span id="after">0</span></div>
-<div class="row"><span>差分</span><span id="diff">0</span></div>
+<div class="row"><span>現在</span><span id="current"class="num">0</span></div>
+<div class="row"><span>変化後</span><span id="after"class="num">0</span></div>
+<div class="row"><span>差分</span><span id="diff"class="num">0</span></div>
 </div>
 
 <div class="card">
-<h2>合計</h2>
-<div class="row"><span>総戦闘力</span><span id="totalPower">0</span></div>
+<h2>全体ボーナス</h2>
+
+<div class="bonusArea">
+
+<div class="bonus-row">
+  <span>資質増加</span>
+  <input id="gBase" type="number" value="0">
+</div>
+
+<div class="bonus-row">
+  <span>バフ増加%</span>
+  <input id="gBuff" type="number" value="0">
+</div>
+
+<div class="bonus-row">
+  <span>固定増加</span>
+  <input id="gFlat" type="number" value="0">
+</div>
+</div>
+</div>
+
+<div class="card">
+<h2>属性ボーナス</h2>
+
+<div class="bonusArea">
+
+<div class="bonus-row">
+  <span>歓楽バフ%</span>
+  <input id="tKanrakuBuff" type="number" value="0">
+</div>
+
+<div class="bonus-row">
+  <span>勤勉バフ%</span>
+  <input id="tKinbenBuff" type="number" value="0">
+</div>
+
+<div class="bonus-row">
+  <span>挑戦バフ%</span>
+  <input id="tChousenBuff" type="number" value="0">
+</div>
+
+<div class="bonus-row">
+  <span>博識バフ%</span>
+  <input id="tHakushikiBuff" type="number" value="0">
+</div>
+
+<div class="bonus-row">
+  <span>自由バフ%</span>
+  <input id="tJiyuuBuff" type="number" value="0">
+</div>
+</div>
+</div>
+
+<div class="card">
+<h2>レアリティボーナス</h2>
+
+<div class="bonusArea">
+
+<div class="bonus-row">
+  <span>URバフ%</span>
+  <input id="rUR" type="number" value="0">
+</div>
+
+<div class="bonus-row">
+  <span>SSRバフ%</span>
+  <input id="rSSR" type="number" value="0">
+</div>
+
+<div class="bonus-row">
+  <span>SRバフ%</span>
+  <input id="rSR" type="number" value="0">
+</div>
+
+<div class="bonus-row">
+  <span>Rバフ%</span>
+  <input id="rR" type="number" value="0">
+</div>
+
+<div class="bonus-row">
+  <span>Nバフ%</span>
+  <input id="rN" type="number" value="0">
+</div>
+</div>
+</div>
+
+<div id="resultBar">
+<div class="row">
+  <span>現在</span>
+  <span id="totalCurrent">0</span>
+</div>
+
+<div class="row">
+  <span>変化後</span>
+  <span id="totalAfter">0</span>
+</div>
+
+<div class="row">
+  <span>差分</span>
+  <span id="totalDiff">0</span>
+</div>
 </div>
 
 <div id="quickPanel">
@@ -89,7 +396,9 @@ const state = {
   flats:{},
   dBase:0,
   dBuff:0,
-  dFlat:0
+  dFlat:0,
+  type:"歓楽",
+  rarity:"SSR"
 };
 
 let activeInput=null;
@@ -108,7 +417,6 @@ after:document.getElementById("after"),
 diff:document.getElementById("diff"),
 buffArea:document.getElementById("buffArea"),
 flatArea:document.getElementById("flatArea"),
-total:document.getElementById("totalPower"),
 quick:document.getElementById("quickPanel")
 };
 
@@ -141,53 +449,141 @@ return coefTable[k[0]];
 計算
 ===================== */
 function calc(s){
-const coef=getCoef(s.level);
-const buff=Object.values(s.buffs).reduce((a,b)=>a+(+b||0),0);
-const flat=Object.values(s.flats).reduce((a,b)=>a+(+b||0),0);
-const final=(+s.final||0)/100;
 
-const base=+s.base||0;
+const coef = getCoef(s.level);
 
-const cur=Math.floor(base*coef*(1+buff/100)*(1+final)+flat);
-const aft=Math.floor((base+s.dBase)*coef*(1+(buff+s.dBuff)/100)*(1+final)+(flat+s.dFlat));
+const buff = Object.values(s.buffs).reduce((a,b)=>a+(+b||0),0);
+const flat = Object.values(s.flats).reduce((a,b)=>a+(+b||0),0);
+const final = (s.final || 0) / 100;
 
-return {current:cur,after:aft,diff:aft-cur,coef};
+const base = +s.base || 0;
+
+// ===== グローバル =====
+const gBase = Number(document.getElementById("gBase")?.value || 0);
+const gBuff = Number(document.getElementById("gBuff")?.value || 0);
+const gFlat = Number(document.getElementById("gFlat")?.value || 0);
+
+// ===== 属性 =====
+const tKanrakuBuff = Number(document.getElementById("tKanrakuBuff")?.value || 0);
+const tKinbenBuff = Number(document.getElementById("tKinbenBuff")?.value || 0);
+const tChousenBuff = Number(document.getElementById("tChousenBuff")?.value || 0);
+const tHakushikiBuff = Number(document.getElementById("tHakushikiBuff")?.value || 0);
+const tJiyuuBuff = Number(document.getElementById("tJiyuuBuff")?.value || 0);
+
+// ===== レア =====
+const rUR = Number(document.getElementById("rUR")?.value || 0);
+const rSSR = Number(document.getElementById("rSSR")?.value || 0);
+const rSR  = Number(document.getElementById("rSR")?.value || 0);
+const rR   = Number(document.getElementById("rR")?.value || 0);
+const rN   = Number(document.getElementById("rN")?.value || 0);
+
+// =====================
+// 現在
+// =====================
+let step1 = Math.floor(base * coef);
+let step2 = Math.floor(step1 * (1 + buff/100));
+
+// 👉 ここが重要（floorしない）
+let step3 = step2 * (1 + final);
+
+let current = Math.floor(step3 + flat);
+
+// =====================
+// after（全部込み）
+// =====================
+
+let totalBuff =
+  buff + s.dBuff + gBuff
+  + (s.type==="歓楽"?tKanrakuBuff:0)
+  + (s.type==="勤勉"?tKinbenBuff:0)
+  + (s.type==="挑戦"?tChousenBuff:0)
+  + (s.type==="博識"?tHakushikiBuff:0)
+  + (s.type==="自由"?tJiyuuBuff:0)
+  + (s.rarity==="UR"?rUR:0)
+  + (s.rarity==="SSR"?rSSR:0)
+  + (s.rarity==="SR"?rSR:0)
+  + (s.rarity==="R"?rR:0)
+  + (s.rarity==="N"?rN:0);
+
+let step1_after = Math.floor((base + s.dBase + gBase) * coef);
+let step2_after = Math.floor(step1_after * (1 + totalBuff/100));
+
+// 👉 ここもfloorしない
+let step3_after = step2_after * (1 + final);
+
+let after = Math.floor(step3_after + (flat + s.dFlat + gFlat));
+
+return {
+  current,
+  after,
+  diff: after - current,
+  coef
+};
+
 }
 
 /* =====================
 UI生成
 ===================== */
 function build(){
-const buffs={
-星ランク:"star",コレクション:"collection",釣り:"fishing",博物館:"museum",
-スキル:"skill",家族:"family",イベント:"event"
-};
+const buffs = [
+  ["星ランク","star_rank"],
+  ["コレクション","collection"],
+  ["釣り","fishing"],
+  ["博物館","museum"],
+  ["絆図鑑","bond_book"], 
+  ["魔王の庇護","magic_protection"],
+  ["建物研修","building_training"],
+  ["家族","family"],
+  ["スキル","skill"],
+  ["見本市","expo"],
+  ["使い魔","familiar"],
+  ["変身着せ替えパワー","costume_transform"],
+  ["仲間リンクパワー","link_power"],
+  ["建物スキン","building_skin"]
+];
 
-const flats={
-星ランク:"star",アイテム:"item",交渉:"trade",イベント:"event"
-};
+const flats = [
+  ["星ランク","star_rank"],
+  ["アイテム","item"],
+  ["交渉","negotiation"],
+  ["釣り","fishing"],
+  ["見本市","expo"],
+  ["魔王の庇護","demon_lord_protection"],
+  ["建物サービスレベル","building_service"],
+  ["家族","family"],
+  ["街ぶらイベント","city_event"],
+  ["ステラ","stella"],
+  ["使い魔","familiar"],
+  ["博物館","museum"],
+  ["建物スキン","building_skin"]
+];
 
-el.buffArea.innerHTML=Object.entries(buffs)
-.map(([k,v])=>`<div>${k}<input data-k="${v}"></div>`).join("");
+el.buffArea.innerHTML = buffs
+.map(([k,v]) => `<div>${k}<input data-k="${v}"></div>`)
+.join("");
 
-el.flatArea.innerHTML=Object.entries(flats)
-.map(([k,v])=>`<div>${k}<input class="quick-target" data-k="${v}"></div>`).join("");
+el.flatArea.innerHTML = flats
+.map(([k,v]) => `<div>${k}<input class="quick-target" data-k="${v}"></div>`)
+.join("");
 }
 
 /* =====================
 sync
 ===================== */
 function sync(){
-state.base=+el.base.value||0;
-state.level=+el.level.value||0;
-state.final=+el.final.value||0;
+state.base = Number(el.base.value.replace(/,/g,"")) || 0;
+state.level = Number(el.level.value.replace(/,/g,"")) || 0;
+state.final = Number(el.final.value.replace(/,/g,"")) || 0;
+state.type=document.getElementById("type").value;
+state.rarity=document.getElementById("rarity").value;
 
 document.querySelectorAll("#buffArea input").forEach(i=>{
-state.buffs[i.dataset.k]=+i.value||0;
+state.buffs[i.dataset.k]=Number(i.value.replace(/,/g,""))||0;
 });
 
 document.querySelectorAll("#flatArea input").forEach(i=>{
-state.flats[i.dataset.k]=+i.value||0;
+state.flats[i.dataset.k]=Number(i.value.replace(/,/g,""))||0;
 });
 }
 
@@ -202,9 +598,16 @@ const r=calc(state);
 el.coef.value=r.coef;
 el.current.textContent=r.current.toLocaleString();
 el.after.textContent=r.after.toLocaleString();
-el.diff.textContent=r.diff.toLocaleString();
+const diffValue=r.diff;
+el.diff.textContent =
+  (diffValue > 0 ? "+" : "") + diffValue.toLocaleString();
+el.diff.style.color =
+    diffValue > 0 ? "#16a34a"
+    : diffValue < 0 ? "#dc2626"
+    : "#111827";
 
 save();
+saveGlobal();
 calcTotal();
 }
 
@@ -216,40 +619,67 @@ function addQuick(mult){
 
   const raw = (activeInput.value || "0").replace(/,/g,"");
 
-  // 300 → "300" + "000" → "300000"
   const newVal = raw + "0".repeat(mult);
 
   activeInput.value = Number(newVal).toLocaleString();
-  activeInput.dispatchEvent(new Event("input"));
+
+  // ★確実に反映
+  render();
 }
 
 /* =====================
 合計
 ===================== */
 function calcTotal(){
-let total=0;
+  const elCurrent = document.getElementById("totalCurrent");
+  const elAfter = document.getElementById("totalAfter");
+  const elDiff = document.getElementById("totalDiff");
 
-const list=JSON.parse(localStorage.getItem("char_list")||"[]");
+  let totalCurrent = 0;
+  let totalAfter = 0;
 
-for(const name of list){
-const raw=localStorage.getItem("char_"+name);
-if(!raw) continue;
+  const list = JSON.parse(localStorage.getItem("char_list") || "[]");
 
-const d=JSON.parse(raw);
+  for(const name of list){
+    const raw = localStorage.getItem("char_" + name);
+    if(!raw) continue;
 
-const safe={
-base:Number(d.base)||0,
-level:Number(d.level)||0,
-final:Number(d.final)||0,
-buffs:d.buffs||{},
-flats:d.flats||{},
-dBase:0,dBuff:0,dFlat:0
-};
+    const d = JSON.parse(raw);
 
-total+=calc(safe).current;
-}
+    const safe = {
+      base: Number(d.base) || 0,
+      level: Number(d.level) || 0,
+      final: Number(d.final) || 0,
+      buffs: d.buffs || {},
+      flats: d.flats || {},
+      dBase: Number(d.dBase) || 0,
+      dBuff: Number(d.dBuff) || 0,
+      dFlat: Number(d.dFlat) || 0,
+      type: d.type || "歓楽",
+      rarity: d.rarity || "SSR"
+    };
 
-el.total.textContent=total.toLocaleString();
+    // ★ここが重要：calcはDOM依存なので「そのまま使う」
+    const result = calc(safe);
+
+    totalCurrent += result.current;
+    totalAfter += result.after;
+  }
+
+  const totalDiff = totalAfter - totalCurrent;
+
+  elCurrent.textContent = totalCurrent.toLocaleString();
+  elAfter.textContent = totalAfter.toLocaleString();
+
+  const diffValue = totalAfter - totalCurrent;
+  const sign = diffValue > 0 ? "+" : "";
+
+  elDiff.textContent = `${sign}${diffValue.toLocaleString()}`;
+
+  elDiff.style.color =
+    diffValue > 0 ? "#16a34a"
+    : diffValue < 0 ? "#dc2626"
+    : "#111827";
 }
 
 /* =====================
@@ -309,6 +739,12 @@ function renderUI(){
 el.base.value=state.base||"";
 el.level.value=state.level||"";
 el.final.value=state.final||"";
+el.base.value = state.base ?? "";
+el.level.value = state.level ?? "";
+el.final.value = state.final ?? "";
+
+document.getElementById("type").value=state.type||"歓楽";
+document.getElementById("rarity").value=state.rarity||"SSR";
 
 document.querySelectorAll("#buffArea input").forEach(i=>{
 i.value=state.buffs[i.dataset.k]||"";
@@ -317,6 +753,13 @@ i.value=state.buffs[i.dataset.k]||"";
 document.querySelectorAll("#flatArea input").forEach(i=>{
 i.value=state.flats[i.dataset.k]||"";
 });
+setTimeout(()=>{
+  document.querySelectorAll("input").forEach(el=>{
+    if(el.value !== "" && !isNaN(el.value.replace(/,/g,""))){
+      el.value = Number(el.value.replace(/,/g,"")).toLocaleString();
+    }
+  });
+},0);
 }
 
 /* =====================
@@ -339,7 +782,25 @@ el.quick.style.display="none";
 }
 });
 
-document.addEventListener("input",render);
+let timer = null;
+
+document.addEventListener("input", (e) => {
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    render();
+  }, 50);
+});
+
+function formatNumberInput(el){
+  const raw = el.value.replace(/,/g,"");
+  if(raw === "") return;
+  el.value = Number(raw).toLocaleString();
+}
+document.addEventListener("blur", (e)=>{
+  if(e.target.matches("input") && !isNaN(e.target.value.replace(/,/g,""))){
+    formatNumberInput(e.target);
+  }
+}, true);
 
 /* =====================
 init
@@ -351,27 +812,98 @@ if(!localStorage.getItem("char_list")){
 }
 
 const list = JSON.parse(localStorage.getItem("char_list") || "[]");
-if(list.length===0)list.push("default");
+if(list.length===0) list.push("default");
 
 list.forEach(n=>{
-const o=document.createElement("option");
-o.value=n;
-o.textContent=n;
-el.character.appendChild(o);
+  const o=document.createElement("option");
+  o.value=n;
+  o.textContent=n;
+  el.character.appendChild(o);
 });
 
 el.character.value=list[0];
-
 state.character=list[0];
 
+// ★順番修正ここが本体
+loadGlobal();
 build();
 load();
+
 })();
+
+function saveGlobal(){
+  const data = {
+    gBase: document.getElementById("gBase")?.value || 0,
+    gBuff: document.getElementById("gBuff")?.value || 0,
+    gFlat: document.getElementById("gFlat")?.value || 0,
+
+    tKanrakuBuff: document.getElementById("tKanrakuBuff")?.value || 0,
+    tKinbenBuff: document.getElementById("tKinbenBuff")?.value || 0,
+    tChousenBuff: document.getElementById("tChousenBuff")?.value || 0,
+    tHakushikiBuff: document.getElementById("tHakushikiBuff")?.value || 0,
+    tJiyuuBuff: document.getElementById("tJiyuuBuff")?.value || 0,
+    
+    rUR:document.getElementById("rUR")?.value||0,
+    rSSR:document.getElementById("rSSR")?.value||0,
+    rSR:document.getElementById("rSR")?.value||0,
+    rR:document.getElementById("rR")?.value||0,
+    rN:document.getElementById("rN")?.value||0
+  };
+
+  localStorage.setItem("global_setting", JSON.stringify(data));
+}
+
+function loadGlobal(){
+  const raw = localStorage.getItem("global_setting");
+  if(!raw) return;
+
+  const d = JSON.parse(raw);
+
+  document.getElementById("gBase").value = d.gBase || 0;
+  document.getElementById("gBuff").value = d.gBuff || 0;
+  document.getElementById("gFlat").value = d.gFlat || 0;
+
+  document.getElementById("tKanrakuBuff").value = d.tKanrakuBuff || 0;
+  document.getElementById("tKinbenBuff").value = d.tKinbenBuff || 0;
+  document.getElementById("tChousenBuff").value = d.tChousenBuff || 0;
+  document.getElementById("tHakushikiBuff").value = d.tHakushikiBuff || 0;
+  document.getElementById("tJiyuuBuff").value = d.tJiyuuBuff || 0;
+
+  document.getElementById("rUR").value=d.rUR||0;
+  document.getElementById("rSSR").value=d.rSSR||0;
+  document.getElementById("rSR").value=d.rSR||0;
+  document.getElementById("rR").value=d.rR||0;
+  document.getElementById("rN").value=d.rN||0
+}
+
+function formatNumberInput(el) {
+  if (!el || el.value === "") return;
+
+  const raw = el.value.replace(/,/g, "");
+
+  if (isNaN(raw)) return;
+
+  el.value = Number(raw).toLocaleString();
+}
+
+// イベント登録
+["gBase","gBuff","gFlat",
+ "tKanrakuBuff","tKinbenBuff","tChousenBuff","tHakushikiBuff","tJiyuuBuff",
+ "rUR","rSSR","rSR","rR","rN"
+].forEach(id=>{
+  document.getElementById(id)?.addEventListener("input", ()=>{
+    saveGlobal();
+    calcTotal();
+  });
+});
+
 </script>
+<!--
 <script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
 </script>
+-->
 </body>
 </html>
