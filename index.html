@@ -4,7 +4,7 @@
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="app.js?v=20260502"></script>
-<link rel="stylesheet" href="style.css?v=260502.2">
+<link rel="stylesheet" href="style.css?v=260502.3">
 <meta name="theme-color" content="#ffffff">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -145,7 +145,8 @@ input:focus, select:focus {
 }
 
 .bonus-row span {
-  white-space:nowrap;
+  white-space: normal;   /* 折り返しOKにする */
+  word-break: break-word; /* 長い単語でも折る */
 }
 
 .bonus-row input {
