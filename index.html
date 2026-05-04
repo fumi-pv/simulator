@@ -4,7 +4,7 @@
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="app.js?v=20260502"></script>
-<link rel="stylesheet" href="style.css?v=260502.9">
+<link rel="stylesheet" href="style.css?v=260504.1">
 <meta name="theme-color" content="#ffffff">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -313,6 +313,29 @@ input:focus, select:focus {
 </div>
 
 <div class="card">
+<h2>個別ボーナス（変化後のみ）</h2>
+
+<div class="bonusArea">
+
+<div class="bonus-row">
+  <span>資質増加</span>
+  <input id="dBase" inputmode="numeric">
+</div>
+
+<div class="bonus-row">
+  <span>バフ増加%</span>
+  <input id="dBuff" inputmode="numeric">
+</div>
+
+<div class="bonus-row">
+  <span>固定増加</span>
+  <input id="dFlat" inputmode="numeric">
+</div>
+
+</div>
+</div>
+
+<div class="card">
 <h2>結果</h2>
 <div class="row"><span>現在</span><span id="current"class="num">0</span></div>
 <div class="row"><span>変化後</span><span id="after"class="num">0</span></div>
@@ -326,7 +349,7 @@ input:focus, select:focus {
 
 <div class="bonus-row">
   <span>資質増加</span>
-  <input id="gBase" type="number" value="0">
+  <input id="gBase" inputmode="numeric" value="0">
 </div>
 
 <div class="bonus-row">
@@ -336,7 +359,7 @@ input:focus, select:focus {
 
 <div class="bonus-row">
   <span>固定増加</span>
-  <input id="gFlat" type="number" value="0">
+  <input id="gFlat" inputmode="numeric" value="0">
 </div>
 </div>
 </div>
@@ -350,25 +373,65 @@ input:focus, select:focus {
   <span>歓楽バフ%</span>
   <input id="tKanrakuBuff" type="number" value="0">
 </div>
+<div class="bonus-row">
+  <span>歓楽資質</span>
+  <input id="tKanrakuBase" inputmode="numeric" value="0">
+</div>
+<div class="bonus-row">
+  <span>歓楽固定</span>
+  <input id="tKanrakuFlat" inputmode="numeric" value="0">
+</div>
 
 <div class="bonus-row">
   <span>勤勉バフ%</span>
   <input id="tKinbenBuff" type="number" value="0">
+</div>
+<div class="bonus-row">
+  <span>勤勉資質</span>
+  <input id="tKinbenBase" inputmode="numeric" value="0">
+</div>
+<div class="bonus-row">
+  <span>勤勉固定</span>
+  <input id="tKinbenFlat" inputmode="numeric" value="0">
 </div>
 
 <div class="bonus-row">
   <span>挑戦バフ%</span>
   <input id="tChousenBuff" type="number" value="0">
 </div>
+<div class="bonus-row">
+  <span>挑戦資質</span>
+  <input id="tChousenBase" inputmode="numeric" value="0">
+</div>
+<div class="bonus-row">
+  <span>挑戦固定</span>
+  <input id="tChousenFlat" inputmode="numeric" value="0">
+</div>
 
 <div class="bonus-row">
   <span>博識バフ%</span>
   <input id="tHakushikiBuff" type="number" value="0">
 </div>
+<div class="bonus-row">
+  <span>博識資質</span>
+  <input id="tHakushikiBase" inputmode="numeric" value="0">
+</div>
+<div class="bonus-row">
+  <span>博識固定</span>
+  <input id="tHakushikiFlat" inputmode="numeric" value="0">
+</div>
 
 <div class="bonus-row">
   <span>自由バフ%</span>
   <input id="tJiyuuBuff" type="number" value="0">
+</div>
+<div class="bonus-row">
+  <span>自由資質</span>
+  <input id="tJiyuuBase" inputmode="numeric" value="0">
+</div>
+<div class="bonus-row">
+  <span>自由固定</span>
+  <input id="tJiyuuFlat" inputmode="numeric" value="0">
 </div>
 </div>
 </div>
@@ -382,25 +445,65 @@ input:focus, select:focus {
   <span>URバフ%</span>
   <input id="rUR" type="number" value="0">
 </div>
+<div class="bonus-row">
+  <span>UR資質</span>
+  <input id="rURBase" type="number" value="0">
+</div>
+<div class="bonus-row">
+  <span>UR固定</span>
+  <input id="rURFlat" type="number" value="0">
+</div>
 
 <div class="bonus-row">
   <span>SSRバフ%</span>
   <input id="rSSR" type="number" value="0">
+</div>
+<div class="bonus-row">
+  <span>SSR資質</span>
+  <input id="rSSRBase" type="number" value="0">
+</div>
+<div class="bonus-row">
+  <span>SSR固定</span>
+  <input id="rSSRFlat" type="number" value="0">
 </div>
 
 <div class="bonus-row">
   <span>SRバフ%</span>
   <input id="rSR" type="number" value="0">
 </div>
+<div class="bonus-row">
+  <span>SR資質</span>
+  <input id="rSRBase" type="number" value="0">
+</div>
+<div class="bonus-row">
+  <span>SR固定</span>
+  <input id="rSRFlat" type="number" value="0">
+</div>
 
 <div class="bonus-row">
   <span>Rバフ%</span>
   <input id="rR" type="number" value="0">
 </div>
+<div class="bonus-row">
+  <span>R資質</span>
+  <input id="rRBase" type="number" value="0">
+</div>
+<div class="bonus-row">
+  <span>R固定</span>
+  <input id="rRFlat" type="number" value="0">
+</div>
 
 <div class="bonus-row">
   <span>Nバフ%</span>
   <input id="rN" type="number" value="0">
+</div>
+<div class="bonus-row">
+  <span>N資質</span>
+  <input id="rNBase" type="number" value="0">
+</div>
+<div class="bonus-row">
+  <span>N固定</span>
+  <input id="rNFlat" type="number" value="0">
 </div>
 </div>
 </div>
@@ -494,6 +597,10 @@ return coefTable[k[0]];
 ===================== */
 function calc(s){
 
+function num(id){
+  return Number((document.getElementById(id)?.value || "0").replace(/,/g,""));
+}
+
 const coef = getCoef(s.level);
 
 const buff = Object.values(s.buffs).reduce((a,b)=>a+(+b||0),0);
@@ -503,23 +610,47 @@ const final = (s.final || 0) / 100;
 const base = +s.base || 0;
 
 // ===== グローバル =====
-const gBase = Number(document.getElementById("gBase")?.value || 0);
-const gBuff = Number(document.getElementById("gBuff")?.value || 0);
-const gFlat = Number(document.getElementById("gFlat")?.value || 0);
+const gBase = num("gBase");
+const gBuff = num("gBuff");
+const gFlat = num("gFlat");
 
 // ===== 属性 =====
-const tKanrakuBuff = Number(document.getElementById("tKanrakuBuff")?.value || 0);
-const tKinbenBuff = Number(document.getElementById("tKinbenBuff")?.value || 0);
-const tChousenBuff = Number(document.getElementById("tChousenBuff")?.value || 0);
-const tHakushikiBuff = Number(document.getElementById("tHakushikiBuff")?.value || 0);
-const tJiyuuBuff = Number(document.getElementById("tJiyuuBuff")?.value || 0);
+const tKanrakuBuff = num("tKanrakuBuff");
+const tKinbenBuff = num("tKinbenBuff");
+const tChousenBuff = num("tChousenBuff");
+const tHakushikiBuff = num("tHakushikiBuff");
+const tJiyuuBuff = num("tJiyuuBuff");
+
+const tKanrakuBase = num("tKanrakuBase");
+const tKinbenBase = num("tKinbenBase");
+const tChousenBase = num("tChousenBase");
+const tHakushikiBase = num("tHakushikiBase");
+const tJiyuuBase = num("tJiyuuBase");
+
+const tKanrakuFlat = num("tKanrakuFlat");
+const tKinbenFlat = num("tKinbenFlat");
+const tChousenFlat = num("tChousenFlat");
+const tHakushikiFlat = num("tHakushikiFlat");
+const tJiyuuFlat = num("tJiyuuFlat");
 
 // ===== レア =====
-const rUR = Number(document.getElementById("rUR")?.value || 0);
-const rSSR = Number(document.getElementById("rSSR")?.value || 0);
-const rSR  = Number(document.getElementById("rSR")?.value || 0);
-const rR   = Number(document.getElementById("rR")?.value || 0);
-const rN   = Number(document.getElementById("rN")?.value || 0);
+const rUR = num("rUR");
+const rSSR = num("rSSR");
+const rSR  = num("rSR");
+const rR   = num("rR");
+const rN   = num("rN");
+
+const rURBase = num("rURBase");
+const rSSRBase = num("rSSRBase");
+const rSRBase  = num("rSRBase");
+const rRBase   = num("rRBase");
+const rNBase   = num("rNBase");
+
+const rURFlat = num("rURFlat");
+const rSSRFlat = num("rSSRFlat");
+const rSRFlat  = num("rSRFlat");
+const rRFlat   = num("rRFlat");
+const rNFlat   = num("rNFlat");
 
 // =====================
 // 現在
@@ -536,8 +667,10 @@ let current = Math.floor(step3 + flat);
 // after（全部込み）
 // =====================
 
-let totalBuff =
-  buff + s.dBuff + gBuff
+const totalBuff =
+  buff
+  + s.dBuff
+  + gBuff
   + (s.type==="歓楽"?tKanrakuBuff:0)
   + (s.type==="勤勉"?tKinbenBuff:0)
   + (s.type==="挑戦"?tChousenBuff:0)
@@ -549,13 +682,41 @@ let totalBuff =
   + (s.rarity==="R"?rR:0)
   + (s.rarity==="N"?rN:0);
 
-let step1_after = Math.floor((base + s.dBase + gBase) * coef);
+const typeBase =
+  (s.type==="歓楽"?tKanrakuBase:0) +
+  (s.type==="勤勉"?tKinbenBase:0) +
+  (s.type==="挑戦"?tChousenBase:0) +
+  (s.type==="博識"?tHakushikiBase:0) +
+  (s.type==="自由"?tJiyuuBase:0);
+
+const rarityBase =
+  (s.rarity==="UR"?rURBase:0) +
+  (s.rarity==="SSR"?rSSRBase:0) +
+  (s.rarity==="SR"?rSRBase:0) +
+  (s.rarity==="R"?rRBase:0) +
+  (s.rarity==="N"?rNBase:0);
+
+let step1_after = Math.floor((base + s.dBase + gBase + typeBase + rarityBase) * coef);
 let step2_after = Math.floor(step1_after * (1 + totalBuff/100));
 
 // 👉 ここもfloorしない
 let step3_after = step2_after * (1 + final);
 
-let after = Math.floor(step3_after + (flat + s.dFlat + gFlat));
+const typeFlat =
+  (s.type==="歓楽"?tKanrakuFlat:0) +
+  (s.type==="勤勉"?tKinbenFlat:0) +
+  (s.type==="挑戦"?tChousenFlat:0) +
+  (s.type==="博識"?tHakushikiFlat:0) +
+  (s.type==="自由"?tJiyuuFlat:0);
+
+const rarityFlat =
+  (s.rarity==="UR"?rURFlat:0) +
+  (s.rarity==="SSR"?rSSRFlat:0) +
+  (s.rarity==="SR"?rSRFlat:0) +
+  (s.rarity==="R"?rRFlat:0) +
+  (s.rarity==="N"?rNFlat:0);
+
+let after = Math.floor(step3_after + (flat + s.dFlat + gFlat + typeFlat + rarityFlat));
 
 return {
   current,
@@ -621,6 +782,9 @@ state.level = Number(el.level.value.replace(/,/g,"")) || 0;
 state.final = Number(el.final.value.replace(/,/g,"")) || 0;
 state.type=document.getElementById("type").value;
 state.rarity=document.getElementById("rarity").value;
+state.dBase = Number(document.getElementById("dBase")?.value.replace(/,/g,"")) || 0;
+state.dBuff = Number(document.getElementById("dBuff")?.value.replace(/,/g,"")) || 0;
+state.dFlat = Number(document.getElementById("dFlat")?.value.replace(/,/g,"")) || 0;
 
 document.querySelectorAll("#buffArea input").forEach(i=>{
 state.buffs[i.dataset.k]=Number(i.value.replace(/,/g,""))||0;
@@ -789,6 +953,9 @@ el.final.value = state.final ?? "";
 
 document.getElementById("type").value=state.type||"歓楽";
 document.getElementById("rarity").value=state.rarity||"SSR";
+document.getElementById("dBase").value = state.dBase || "";
+document.getElementById("dBuff").value = state.dBuff || "";
+document.getElementById("dFlat").value = state.dFlat || "";
 
 document.querySelectorAll("#buffArea input").forEach(i=>{
 i.value=state.buffs[i.dataset.k]||"";
@@ -829,10 +996,12 @@ el.quick.style.display="none";
 let timer = null;
 
 document.addEventListener("input", (e) => {
-  clearTimeout(timer);
-  timer = setTimeout(() => {
-    render();
-  }, 50);
+  if (e.target.matches("input")) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      render();
+    }, 50);
+  }
 });
 
 function formatNumberInput(el){
@@ -843,6 +1012,7 @@ function formatNumberInput(el){
 document.addEventListener("blur", (e)=>{
   if(e.target.matches("input") && !isNaN(e.target.value.replace(/,/g,""))){
     formatNumberInput(e.target);
+    render(); // ←これ追加
   }
 }, true);
 
@@ -967,11 +1137,35 @@ function saveGlobal(){
     tHakushikiBuff: document.getElementById("tHakushikiBuff")?.value || 0,
     tJiyuuBuff: document.getElementById("tJiyuuBuff")?.value || 0,
     
+    tKanrakuBase: document.getElementById("tKanrakuBase")?.value || 0,
+    tKinbenBase: document.getElementById("tKinbenBase")?.value || 0,
+    tChousenBase: document.getElementById("tChousenBase")?.value || 0,
+    tHakushikiBase: document.getElementById("tHakushikiBase")?.value || 0,
+    tJiyuuBase: document.getElementById("tJiyuuBase")?.value || 0,
+
+    tKanrakuFlat: document.getElementById("tKanrakuFlat")?.value || 0,
+    tKinbenFlat: document.getElementById("tKinbenFlat")?.value || 0,
+    tChousenFlat: document.getElementById("tChousenFlat")?.value || 0,
+    tHakushikiFlat: document.getElementById("tHakushikiFlat")?.value || 0,
+    tJiyuuFlat: document.getElementById("tJiyuuFlat")?.value || 0,
+
+    rURBase: document.getElementById("rURBase")?.value || 0,
+    rSSRBase: document.getElementById("rSSRBase")?.value || 0,
+    rSRBase: document.getElementById("rSRBase")?.value || 0,
+    rRBase: document.getElementById("rRBase")?.value || 0,
+    rNBase: document.getElementById("rNBase")?.value || 0,
+
     rUR:document.getElementById("rUR")?.value||0,
     rSSR:document.getElementById("rSSR")?.value||0,
     rSR:document.getElementById("rSR")?.value||0,
     rR:document.getElementById("rR")?.value||0,
-    rN:document.getElementById("rN")?.value||0
+    rN:document.getElementById("rN")?.value||0,
+
+    rURFlat: document.getElementById("rURFlat")?.value || 0,
+    rSSRFlat: document.getElementById("rSSRFlat")?.value || 0,
+    rSRFlat: document.getElementById("rSRFlat")?.value || 0,
+    rRFlat: document.getElementById("rRFlat")?.value || 0,
+    rNFlat: document.getElementById("rNFlat")?.value || 0
   };
 
   localStorage.setItem("global_setting", JSON.stringify(data));
@@ -993,11 +1187,35 @@ function loadGlobal(){
   document.getElementById("tHakushikiBuff").value = d.tHakushikiBuff || 0;
   document.getElementById("tJiyuuBuff").value = d.tJiyuuBuff || 0;
 
+  document.getElementById("tKanrakuBase").value = d.tKanrakuBase || 0;
+  document.getElementById("tKinbenBase").value = d.tKinbenBase || 0;
+  document.getElementById("tChousenBase").value = d.tChousenBase || 0;
+  document.getElementById("tHakushikiBase").value = d.tHakushikiBase || 0;
+  document.getElementById("tJiyuuBase").value = d.tJiyuuBase || 0;
+
+  document.getElementById("tKanrakuFlat").value = d.tKanrakuFlat || 0;
+  document.getElementById("tKinbenFlat").value = d.tKinbenFlat || 0;
+  document.getElementById("tChousenFlat").value = d.tChousenFlat || 0;
+  document.getElementById("tHakushikiFlat").value = d.tHakushikiFlat || 0;
+  document.getElementById("tJiyuuFlat").value = d.tJiyuuFlat || 0;
+
+  document.getElementById("rURBase").value=d.rURBase||0;
+  document.getElementById("rSSRBase").value=d.rSSRBase||0;
+  document.getElementById("rSRBase").value=d.rSRBase||0;
+  document.getElementById("rRBase").value=d.rRBase||0;
+  document.getElementById("rNBase").value=d.rNBase||0;
+
   document.getElementById("rUR").value=d.rUR||0;
   document.getElementById("rSSR").value=d.rSSR||0;
   document.getElementById("rSR").value=d.rSR||0;
   document.getElementById("rR").value=d.rR||0;
-  document.getElementById("rN").value=d.rN||0
+  document.getElementById("rN").value=d.rN||0;
+
+  document.getElementById("rURFlat").value=d.rURFlat||0;
+  document.getElementById("rSSRFlat").value=d.rSSRFlat||0;
+  document.getElementById("rSRFlat").value=d.rSRFlat||0;
+  document.getElementById("rRFlat").value=d.rRFlat||0;
+  document.getElementById("rNFlat").value=d.rNFlat||0
 }
 
 function formatNumberInput(el) {
@@ -1017,7 +1235,7 @@ function formatNumberInput(el) {
 ].forEach(id=>{
   document.getElementById(id)?.addEventListener("input", ()=>{
     saveGlobal();
-    calcTotal();
+    render(); // ←これに変える（超重要）
   });
 });
 
